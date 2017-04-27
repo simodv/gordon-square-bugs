@@ -1,0 +1,172 @@
+# The following is a full list of 
+# QIIME and PICRUSt commands used for data analysis. 
+
+### Summary of BIOM table:
+
+biom summarize-table -i merged_otu_table.biom  -o merged_otu_table_counts_summary.txt
+
+biom summarize-table -i merged_otu_table.biom --qualitative -o merged_otu_table_observations_summary.txt
+
+
+### Integrated workflow for diversity analysis:
+
+core_diversity_analyses.py -i merged_otu_table.biom -o core_diversity_analysis -m map.tsv_corrected.txt -e 371590 -t 97_otus.tree
+
+### Testing statistical significance in alpha diversity:
+
+compare_alpha_diversity.py -i observed_otus.txt -m map.tsv_corrected.txt -c Year  -o compare_alphadiv_YEAR
+
+
+### Analysing the core microbiome:
+
+compute_core_microbiome.py -i merged_otu_table.biom -o merged_otu_table_core_microbiome
+
+### Testing statistical significance in beta diversity (by year):
+
+compare_categories.py --method adonis -i unweighted_unifrac_dm.txt -m map.tsv_corrected.txt -c Year -o ADONIS_OUT 
+
+compare_categories.py --method anosim -i unweighted_unifrac_dm.txt -m map.tsv_corrected.txt -c Year -o ANOSIM_OUT 
+
+compare_categories.py --method bioenv -i unweighted_unifrac_dm.txt -m map.tsv_corrected.txt -c Year -o BIOENV_OUT 
+
+compare_categories.py --method mrpp -i unweighted_unifrac_dm.txt -m map.tsv_corrected.txt -c Year -o MRPP_OUT 
+
+compare_categories.py --method permanova -i unweighted_unifrac_dm.txt -m map.tsv_corrected.txt -c Year -o PERMANOVA_OUT 
+
+
+###  Comparing OTU frequencies across sample groups (by year):
+	
+group_significance.py -i merged_otu_table.biom -m map.tsv_corrected.txt -c Year -s nonparametric_t_test -o npttest_stats.txt
+
+group_significance.py -i merged_otu_table.biom -m map.tsv_corrected.txt -c Year -s parametric_t_test -o pttest_stats.txt
+
+
+### Boxplots and more statistical analysis of beta diversity (by year):
+
+make_distance_boxplots.py -m map.tsv_corrected.txt -d unweighted_unifrac_dm.txt -f Year -o boxplot_output_by_YEAR -g png --save_raw_data
+
+### Analysing jackknifed beta diversity to account for UniFrac distances' sensitivity to sampling depth
+
+jackknifed_beta_diversity.py -i merged_otu_table.biom -o jack_beta_div -e 371590 -m map.tsv_corrected.txt -t 97_otus.tree
+
+
+### + repeat statistical significance analysis of beta diversity (by year):
+
+compare_categories.py --method anosim -i unweighted_unifrac_rarefaction_371590_0.txt -m map.tsv_corrected.txt -c Year -o ANOSIM_OUT_0 
+
+compare_categories.py --method anosim -i unweighted_unifrac_rarefaction_371590_1.txt -m map.tsv_corrected.txt -c Year -o ANOSIM_OUT_1
+
+compare_categories.py --method anosim -i unweighted_unifrac_rarefaction_371590_2.txt -m map.tsv_corrected.txt -c Year -o ANOSIM_OUT_2
+
+compare_categories.py --method anosim -i unweighted_unifrac_rarefaction_371590_3.txt -m map.tsv_corrected.txt -c Year -o ANOSIM_OUT_3
+
+compare_categories.py --method anosim -i unweighted_unifrac_rarefaction_371590_4.txt -m map.tsv_corrected.txt -c Year -o ANOSIM_OUT_4
+
+compare_categories.py --method anosim -i unweighted_unifrac_rarefaction_371590_5.txt -m map.tsv_corrected.txt -c Year -o ANOSIM_OUT_5
+
+compare_categories.py --method anosim -i unweighted_unifrac_rarefaction_371590_6.txt -m map.tsv_corrected.txt -c Year -o ANOSIM_OUT_6
+
+compare_categories.py --method anosim -i unweighted_unifrac_rarefaction_371590_7.txt -m map.tsv_corrected.txt -c Year -o ANOSIM_OUT_7
+
+compare_categories.py --method anosim -i unweighted_unifrac_rarefaction_371590_8.txt -m map.tsv_corrected.txt -c Year -o ANOSIM_OUT_8
+
+compare_categories.py --method anosim -i unweighted_unifrac_rarefaction_371590_9.txt -m map.tsv_corrected.txt -c Year -o ANOSIM_OUT_9 
+
+
+
+### Summarising taxonomy:
+
+	# Over 5%:
+
+		summarize_taxa.py -i merged_otu_table.biom -o taxa_summary_over_5percent  -u 0.05
+
+		# Phyla:
+
+		plot_taxa_summary.py -i taxa_summary_over_5percent/merged_otu_table_L2.txt -o taxa_plots_L2_over_5_percent 
+
+		# Class:
+
+		plot_taxa_summary.py -i taxa_summary_over_5percent/merged_otu_table_L3.txt -o taxa_plots_L3_over_5_percent 
+
+	#  Over 2.5%:
+
+		summarize_taxa.py -i merged_otu_table.biom -o taxa_summary_over_2point5percent  -u 0.025
+
+
+		# Phyla:
+
+		plot_taxa_summary.py -i taxa_summary_over_2point5percent/merged_otu_table_L2.txt -o taxa_plots_L2_over_2point5_percent 
+
+		# Class:
+
+		plot_taxa_summary.py -i taxa_summary_over_2point5percent/merged_otu_table_L3.txt -o taxa_plots_L3_over_2point5_percent 
+
+	# Over 1%:
+
+		summarize_taxa.py -i merged_otu_table.biom -o taxa_summary_over_1percent  -u 0.01
+
+		# Phyla:
+
+        plot_taxa_summary.py -i taxa_summary_over_1percent/merged_otu_table_L2.txt -o taxa_plots_L2_over_1_percent 
+
+		# Class:
+
+		plot_taxa_summary.py -i taxa_summary_over_1percent/merged_otu_table_L3.txt -o taxa_plots_L3_over_1_percent 
+
+### PICRUSt: predicting metagenomes and functional profiles
+
+### Normalising OTU table:
+
+normalize_by_copy_number.py -i merged_otu_table.biom -o normalized_biom_table.biom
+
+### Predicting metagenomes/functions:
+
+predict_metagenomes.py -i normalized_biom_table.biom -o metagenome_functional_predictions.biom
+
+### Collapsing predictions into pathways at 3 hierarchical levels:
+
+categorize_by_function.py -i metagenome_functional_predictions.biom -c KEGG_Pathways -l 1 -o cat_by_fun_KEGG_predicted_metagenomes.L1.biom
+
+categorize_by_function.py -i metagenome_functional_predictions.biom -c KEGG_Pathways -l 2 -o cat_by_fun_KEGG_predicted_metagenomes.L2.biom
+
+categorize_by_function.py -i metagenome_functional_predictions.biom -c KEGG_Pathways -l 3 -o cat_by_fun_KEGG_predicted_metagenomes.L3.biom
+
+### Analysing metagenomes using QIIME:
+
+	# obtain Euclidean distance matrix:
+
+		beta_diversity.py -i cat_by_fun_KEGG_predicted_metagenomes.L3.biom -m euclidean -o beta_div_fxn
+
+	# obtain PCoA coordinates and make Emperor plots:
+		
+		principal_coordinates.py -i euclidean_cat_by_fun_KEGG_predicted_metagenomes.L3.txt -o beta_div_coords.txt
+
+		make_emperor.py -i beta_div_coords.txt  -m map.tsv_corrected.txt -o emperor_plot
+
+	# test for statistical significance in sample grouping by year:
+
+
+	compare_categories.py --method anosim -i euclidean_cat_by_fun_KEGG_predicted_metagenomes.L3.txt -m map.tsv_corrected.txt -c Year -o ANOSIM_OUT 
+
+
+### Summarising functions (KEGG pathways):
+
+# At level 1:
+
+summarize_taxa_through_plots.py -i cat_by_fun_KEGG_predicted_metagenomes.L1.biom -p qiime_params_L1.txt -o plots_at_level1
+
+# At level 2:
+
+summarize_taxa_through_plots.py -i cat_by_fun_KEGG_predicted_metagenomes.L2.biom -p qiime_params_L2.txt -o plots_at_level2 -u 0.05
+
+# At level 3:
+
+summarize_taxa_through_plots.py -i cat_by_fun_KEGG_predicted_metagenomes.L3.biom -p qiime_params_L3.txt -o plots_at_level3
+
+
+
+
+
+
+
+

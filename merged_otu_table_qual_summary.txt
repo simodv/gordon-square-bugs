@@ -1,0 +1,25 @@
+Num samples: 12
+Num observations: 15504
+
+Observations/sample summary:
+ Min: 4995
+ Max: 8982
+ Median: 6774.000
+ Mean: 6862.750
+ Std. dev.: 1047.331
+ Sample Metadata Categories: None provided
+ Observation Metadata Categories: taxonomy
+
+Observations/sample detail:
+15.16.4: 4995
+15.16.3: 5622
+16.17.6: 6069
+16.17.5: 6361
+16.17.7: 6432
+16.17.3: 6626
+16.17.1: 6922
+16.17.8: 7264
+16.17.4: 7415
+15.16.2: 7541
+15.16.1: 8124
+16.17.2: 8982
